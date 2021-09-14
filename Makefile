@@ -5,7 +5,7 @@ RELATED_IMAGE_OPENSCAP_NAME=openscap-ocp
 
 # Container image variables
 # =========================
-IMAGE_REPO?=quay.io/compliance-operator
+IMAGE_REPO?=quay.io/gquillar
 
 # Detect the OS to set per-OS defaults
 OS_NAME=$(shell uname -s)
@@ -52,7 +52,12 @@ TAG?=latest
 CURPATH=$(PWD)
 TARGET_DIR=$(CURPATH)/build/_output
 GOFLAGS?=-mod=vendor
-GO=GOFLAGS=$(GOFLAGS) GO111MODULE=auto go
+ifeq ($(shell uname -m), ppc64le)
+    ARCH=ppc64le
+else
+    ARCH=x86_64
+endif
+GO=GOFLAGS=$(GOFLAGS) GOARCH=$(ARCH) GO111MODULE=auto go
 GOBUILD=$(GO) build
 BUILD_GOPATH=$(TARGET_DIR):$(CURPATH)/cmd
 TARGET=$(TARGET_DIR)/bin/$(APP_NAME)
@@ -75,14 +80,15 @@ export OPERATOR_NAMESPACE?=openshift-compliance
 # ======================
 SDK_VERSION?=v0.18.2
 ifeq ($(OS_NAME), Linux)
-    OPERATOR_SDK_URL=https://github.com/operator-framework/operator-sdk/releases/download/$(SDK_VERSION)/operator-sdk-$(SDK_VERSION)-x86_64-linux-gnu
+    OPERATOR_SDK_URL=https://github.com/operator-framework/operator-sdk/releases/download/$(SDK_VERSION)/operator-sdk-$(SDK_VERSION)-$(ARCH)-linux-gnu
 else ifeq ($(OS_NAME), Darwin)
     OPERATOR_SDK_URL=https://github.com/operator-framework/operator-sdk/releases/download/$(SDK_VERSION)/operator-sdk-$(SDK_VERSION)-x86_64-apple-darwin
 endif
 
 OPM_VERSION=v1.15.2
 ifeq ($(OS_NAME), Linux)
-    OPM_URL=https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/linux-amd64-opm
+    OPM_URL=https://mirror.openshift.com/pub/openshift-v4/$(ARCH)/clients/ocp/latest-4.7/
+    OPM_FILENAME=opm-linux
 else ifeq ($(OS_NAME), Darwin)
     OPM_URL=https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/darwin-amd64-opm
 endif
@@ -103,8 +109,8 @@ E2E_SKIP_CONTAINER_BUILD?=false
 E2E_GO_TEST_FLAGS?=-test.v -test.timeout 120m
 
 # Specifies the image path to use for the content in the tests
-DEFAULT_CONTENT_IMAGE_PATH=quay.io/complianceascode/ocp4:latest
-E2E_CONTENT_IMAGE_PATH?=quay.io/complianceascode/ocp4:latest
+DEFAULT_CONTENT_IMAGE_PATH=quay.io/gquillar/ocp4:latest
+E2E_CONTENT_IMAGE_PATH?=quay.io/gquillar/ocp4:latest
 # We specifically omit the tag here since we only use this for testing.
 E2E_BROKEN_CONTENT_IMAGE_PATH?=quay.io/compliance-operator/test-broken-content:latest
 
@@ -218,7 +224,14 @@ $(GOPATH)/bin/operator-sdk:
 opm: $(GOPATH)/bin/opm
 
 $(GOPATH)/bin/opm:
-	wget -nv $(OPM_URL) -O $(GOPATH)/bin/opm || (echo "wget returned $$? trying to fetch opm. please install opm and try again"; exit 1)
+ifeq ($(OS_NAME), Linux)
+	wget -nv $(OPM_URL)/$(OPM_FILENAME).tar.gz || (echo "wget returned $$? trying to fetch opm. please install opm and try again"; exit 1)
+	tar -xvf $(OPM_FILENAME).tar.gz
+	mv ./opm $(GOPATH)/bin/opm
+	rm $(OPM_FILENAME).tar.gz
+else
+        wget -nv $(OPM_URL) -O $(GOPATH)/bin/opm || (echo "wget returned $$? trying to fetch opm. please install opm and try again"; exit 1)
+endif
 	chmod +x $(GOPATH)/bin/opm
 
 .PHONY: run
