@@ -106,13 +106,13 @@ E2E_SKIP_CONTAINER_BUILD?=false
 # Pass extra flags to the e2e test run.
 # e.g. to run a specific test in the e2e test suite, do:
 # 	make e2e E2E_GO_TEST_FLAGS="-v -run TestE2E/TestScanWithNodeSelectorFiltersCorrectly"
-E2E_GO_TEST_FLAGS?=-test.v -test.timeout 120m
+E2E_GO_TEST_FLAGS?=-test.v -test.timeout 1200m
 
 # Specifies the image path to use for the content in the tests
 DEFAULT_CONTENT_IMAGE_PATH=quay.io/gquillar/ocp4:latest
 E2E_CONTENT_IMAGE_PATH?=quay.io/gquillar/ocp4:latest
 # We specifically omit the tag here since we only use this for testing.
-E2E_BROKEN_CONTENT_IMAGE_PATH?=quay.io/compliance-operator/test-broken-content:latest
+E2E_BROKEN_CONTENT_IMAGE_PATH?=quay.io/gquillar/test-broken-content:latest
 
 QUAY_NAMESPACE=compliance-operator
 OPERATOR_VERSION?=
