@@ -4,7 +4,7 @@ metadata:
   name: compliance-operator
   namespace: openshift-marketplace
 spec:
-  displayName: Compliance Operator
+  displayName: Compliance Operator Upstream
   publisher: github.com/openshift/compliance-operator
   sourceType: grpc
   image: quay.io/gquillar/compliance-operator-index:latest

@@ -21,17 +21,17 @@ var _ = BeforeSuite(func() {
 	client = fake.NewFakeClientWithScheme(cmpScheme)
 
 	pInput = newParserInput("test-profile", testNamespace,
-		"quay.io/abonnet/ocp4-openscap-content:proff_diff_baseline",
+		"quay.io/gquillar/ocp4-openscap-content:proff_diff_baseline",
 		"../../tests/data/ssg-ocp4-ds-new.xml",
 		client, cmpScheme)
 
 	pInput2 = newParserInput("test-anotherprofile", testNamespace,
-		"quay.io/abonnet/ocp4-openscap-content:proff_diff_baseline",
+		"quay.io/gquillar/ocp4-openscap-content:proff_diff_baseline",
 		"../../tests/data/ssg-ocp4-ds-new.xml",
 		client, cmpScheme)
 
 	pInputModified = newParserInput("test-profile", testNamespace,
-		"quay.io/abonnet/ocp4-openscap-content:proff_diff_mod",
+		"quay.io/gquillar/ocp4-openscap-content:proff_diff_mod",
 		"../../tests/data/ssg-ocp4-ds-new-modified.xml",
 		client, cmpScheme)
 })

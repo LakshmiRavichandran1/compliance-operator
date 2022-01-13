@@ -17,6 +17,15 @@ else ifeq ($(OS_NAME), Darwin)
     RUNTIME?=docker
     SED=sed -i ''
 endif
+# Detect the ARCH to set per-ARCH defaults
+ARCH_NAME=($(shell uname -m)
+ifeq ($(ARCH_NAME), ppc64le)
+    ARCH=ppc64le
+ifeq ($(ARCH_NAME), s390x)
+    ARCH=s390x
+else
+    ARCH=x86_64
+endif
 
 ifeq ($(RUNTIME), podman)
     LOGIN_PUSH_OPTS="--tls-verify=false"
@@ -52,12 +61,7 @@ TAG?=latest
 CURPATH=$(PWD)
 TARGET_DIR=$(CURPATH)/build/_output
 GOFLAGS?=-mod=vendor
-ifeq ($(shell uname -m), ppc64le)
-    ARCH=ppc64le
-else
-    ARCH=x86_64
-endif
-GO=GOFLAGS=$(GOFLAGS) GOARCH=$(ARCH) GO111MODULE=auto go
+GO=GOFLAGS=$(GOFLAGS) GO111MODULE=auto go
 GOBUILD=$(GO) build
 BUILD_GOPATH=$(TARGET_DIR):$(CURPATH)/cmd
 TARGET=$(TARGET_DIR)/bin/$(APP_NAME)
@@ -99,7 +103,7 @@ TEST_OPTIONS?=
 # Skip pushing the container to your cluster
 E2E_SKIP_CONTAINER_PUSH?=false
 # Use default images in the e2e test run. Note that this takes precedence over E2E_SKIP_CONTAINER_PUSH
-E2E_USE_DEFAULT_IMAGES?=false
+E2E_USE_DEFAULT_IMAGES?=true
 # In a local-env e2e run, push images to the cluster but skip building them. Useful if the container push fails.
 E2E_SKIP_CONTAINER_BUILD?=false
 
