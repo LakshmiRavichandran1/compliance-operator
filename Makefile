@@ -18,10 +18,10 @@ else ifeq ($(OS_NAME), Darwin)
     SED=sed -i ''
 endif
 # Detect the ARCH to set per-ARCH defaults
-ARCH_NAME=($(shell uname -m)
+ARCH_NAME=$(shell uname -m)
 ifeq ($(ARCH_NAME), ppc64le)
     ARCH=ppc64le
-ifeq ($(ARCH_NAME), s390x)
+else ifeq ($(ARCH_NAME), s390x)
     ARCH=s390x
 else
     ARCH=x86_64
@@ -91,7 +91,7 @@ endif
 
 OPM_VERSION=v1.15.2
 ifeq ($(OS_NAME), Linux)
-    OPM_URL=https://mirror.openshift.com/pub/openshift-v4/$(ARCH)/clients/ocp/latest-4.7/
+    OPM_URL=https://mirror.openshift.com/pub/openshift-v4/$(ARCH)/clients/ocp/latest-4.7
     OPM_FILENAME=opm-linux
 else ifeq ($(OS_NAME), Darwin)
     OPM_URL=https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/darwin-amd64-opm
@@ -159,7 +159,7 @@ test-bundle-image:
 
 .PHONY: index-image
 index-image: opm
-	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(BUNDLE_IMAGE_TAG) -f $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -t $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -c $(RUNTIME) --overwrite-latest
+	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(BUNDLE_IMAGE_TAG) -f $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -t $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -c $(RUNTIME) --overwrite-latest --binary-image quay.io/operator-framework/opm
 
 .PHONY: test-index-image
 test-index-image: opm test-bundle-image push-test-bundle
