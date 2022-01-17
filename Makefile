@@ -159,11 +159,11 @@ test-bundle-image:
 
 .PHONY: index-image
 index-image: opm
-	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(BUNDLE_IMAGE_TAG) -f $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -t $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -c $(RUNTIME) --overwrite-latest --binary-image quay.io/operator-framework/opm
+	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(BUNDLE_IMAGE_TAG) -f $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -t $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -c $(RUNTIME) --binary-image quay.io/operator-framework/opm
 
 .PHONY: test-index-image
 test-index-image: opm test-bundle-image push-test-bundle
-	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(TEST_BUNDLE_IMAGE_TAG) -t $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -c $(RUNTIME)
+	$(GOPATH)/bin/opm index add -b $(BUNDLE_IMAGE_PATH):$(TEST_BUNDLE_IMAGE_TAG) -t $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) -c $(RUNTIME) --binary-image quay.io/operator-framework/opm
 
 .PHONY: index-image-to-cluster
 index-image-to-cluster: namespace openshift-user test-index-image
@@ -234,7 +234,7 @@ ifeq ($(OS_NAME), Linux)
 	mv ./opm $(GOPATH)/bin/opm
 	rm $(OPM_FILENAME).tar.gz
 else
-        wget -nv $(OPM_URL) -O $(GOPATH)/bin/opm || (echo "wget returned $$? trying to fetch opm. please install opm and try again"; exit 1)
+	wget -nv $(OPM_URL) -O $(GOPATH)/bin/opm || (echo "wget returned $$? trying to fetch opm. please install opm and try again"; exit 1)
 endif
 	chmod +x $(GOPATH)/bin/opm
 
