@@ -29,8 +29,8 @@ func TestE2E(t *testing.T) {
 			IsParallel: true,
 			TestFn: func(t *testing.T, f *framework.Framework, ctx *framework.Context, mcTctx *mcTestCtx, namespace string) error {
 				const (
-					baselineImage       = "quay.io/gquillar/ocp4-openscap-content:proff_diff_baseline"
-					modifiedImage       = "quay.io/gquillar/ocp4-openscap-content:proff_diff_mod"
+					baselineImage       = "quay.io/lakshmiravichandran/ocp4-openscap-content:proff_diff_baseline"
+					modifiedImage       = "quay.io/lakshmiravichandran/ocp4-openscap-content:proff_diff_mod"
 					removedRule         = "chronyd-no-chronyc-network"
 					unlinkedRule        = "chronyd-client-only"
 					moderateProfileName = "moderate"
@@ -130,14 +130,14 @@ func TestE2E(t *testing.T) {
 			IsParallel: true,
 			TestFn: func(t *testing.T, f *framework.Framework, ctx *framework.Context, mcTctx *mcTestCtx, namespace string) error {
 				const (
-					baselineImage       = "quay.io/gquillar/ocp4-openscap-content:proff_diff_baseline"
+					baselineImage       = "quay.io/lakshmiravichandran/ocp4-openscap-content:proff_diff_baseline"
 					modifiedImageDigest = ":proff_diff_mod"
 					removedRule         = "chronyd-no-chronyc-network"
 					unlinkedRule        = "chronyd-client-only"
 					moderateProfileName = "moderate"
 				)
 				var (
-					modifiedImage = fmt.Sprintf("quay.io/gquillar/ocp4-openscap-content%s", modifiedImageDigest)
+					modifiedImage = fmt.Sprintf("quay.io/lakshmiravichandran/ocp4-openscap-content%s", modifiedImageDigest)
 				)
 
 				prefixName := func(profName, ruleBaseName string) string { return profName + "-" + ruleBaseName }
@@ -235,14 +235,14 @@ func TestE2E(t *testing.T) {
 			IsParallel: true,
 			TestFn: func(t *testing.T, f *framework.Framework, ctx *framework.Context, mcTctx *mcTestCtx, namespace string) error {
 				const (
-					baselineImage       = "quay.io/gquillar/ocp4-openscap-content:proff_diff_baseline"
+					baselineImage       = "quay.io/lakshmiravichandran/ocp4-openscap-content:proff_diff_baseline"
 					modifiedImageDigest = ":proff_diff_mod"
 					removedRule         = "chronyd-no-chronyc-network"
 					unlinkedRule        = "chronyd-client-only"
 					moderateProfileName = "moderate"
 				)
 				var (
-					modifiedImage = fmt.Sprintf("quay.io/gquillar/ocp4-openscap-content%s", modifiedImageDigest)
+					modifiedImage = fmt.Sprintf("quay.io/lakshmiravichandran/ocp4-openscap-content%s", modifiedImageDigest)
 				)
 
 				prefixName := func(profName, ruleBaseName string) string { return profName + "-" + ruleBaseName }
@@ -403,8 +403,8 @@ func TestE2E(t *testing.T) {
 			IsParallel: true,
 			TestFn: func(t *testing.T, f *framework.Framework, ctx *framework.Context, mcTctx *mcTestCtx, namespace string) error {
 				const (
-					badImage  = "quay.io/gquillar/ocp4-errtest-content:from"
-					goodImage = "quay.io/gquillar/ocp4-errtest-content:to"
+					badImage  = "quay.io/lakshmiravichandran/ocp4-errtest-content:from"
+					goodImage = "quay.io/lakshmiravichandran/ocp4-errtest-content:to"
 				)
 
 				pbName := getObjNameFromTest(t)
@@ -1843,7 +1843,7 @@ func TestE2E(t *testing.T) {
 							{
 								Name: fmt.Sprintf("%s-workers-scan", suiteName),
 								ComplianceScanSpec: compv1alpha1.ComplianceScanSpec{
-									ContentImage: "quay.io/gquillar/ocp4-openscap-content:broken_os_detection",
+									ContentImage: "quay.io/lakshmiravichandran/ocp4-openscap-content:broken_os_detection",
 									Profile:      "xccdf_org.ssgproject.content_profile_moderate",
 									Content:      "ssg-rhcos4-ds.xml",
 									ComplianceScanSettings: compv1alpha1.ComplianceScanSettings{
@@ -2359,7 +2359,7 @@ func TestE2E(t *testing.T) {
 						Scans: []compv1alpha1.ComplianceScanSpecWrapper{
 							{
 								ComplianceScanSpec: compv1alpha1.ComplianceScanSpec{
-									ContentImage: "quay.io/gquillar/ocp4:latest",
+									ContentImage: "quay.io/lakshmiravichandran/ocp4:latest",
 									Profile:      "xccdf_org.ssgproject.content_profile_moderate",
 									Rule:         "xccdf_org.ssgproject.content_rule_no_direct_root_logins",
 									Content:      rhcosContentFile,
@@ -2674,8 +2674,8 @@ func TestE2E(t *testing.T) {
 				workerScanName := fmt.Sprintf("%s-e2e-scan", origSuiteName)
 
 				const (
-					origImage = "quay.io/gquillar/ocp4-openscap-content:rem_mod_base"
-					modImage  = "quay.io/gquillar/ocp4-openscap-content:rem_mod_change"
+					origImage = "quay.io/lakshmiravichandran/ocp4-openscap-content:rem_mod_base"
+					modImage  = "quay.io/lakshmiravichandran/ocp4-openscap-content:rem_mod_change"
 				)
 
 				origSuite := &compv1alpha1.ComplianceSuite{
@@ -2773,7 +2773,7 @@ func TestE2E(t *testing.T) {
 			Name:       "TestProfileBundleDefaultIsKept",
 			IsParallel: false,
 			TestFn: func(t *testing.T, f *framework.Framework, ctx *framework.Context, mcTctx *mcTestCtx, namespace string) error {
-				const otherImage = "quay.io/gquillar/ocp4-openscap-content:proff_diff_baseline"
+				const otherImage = "quay.io/lakshmiravichandran/ocp4-openscap-content:proff_diff_baseline"
 				var bctx = goctx.Background()
 
 				ocpPb, err := getReadyProfileBundle(t, f, "ocp4", namespace)

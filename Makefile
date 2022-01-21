@@ -5,7 +5,7 @@ RELATED_IMAGE_OPENSCAP_NAME=openscap-ocp
 
 # Container image variables
 # =========================
-IMAGE_REPO?=quay.io/gquillar
+IMAGE_REPO?=quay.io/lakshmiravichandran
 
 # Detect the OS to set per-OS defaults
 OS_NAME=$(shell uname -s)
@@ -113,10 +113,10 @@ E2E_SKIP_CONTAINER_BUILD?=false
 E2E_GO_TEST_FLAGS?=-test.v -test.timeout 1200m
 
 # Specifies the image path to use for the content in the tests
-DEFAULT_CONTENT_IMAGE_PATH=quay.io/gquillar/ocp4:latest
-E2E_CONTENT_IMAGE_PATH?=quay.io/gquillar/ocp4:latest
+DEFAULT_CONTENT_IMAGE_PATH=quay.io/lakshmiravichandran/ocp4:latest
+E2E_CONTENT_IMAGE_PATH?=quay.io/lakshmiravichandran/ocp4:latest
 # We specifically omit the tag here since we only use this for testing.
-E2E_BROKEN_CONTENT_IMAGE_PATH?=quay.io/gquillar/test-broken-content:latest
+E2E_BROKEN_CONTENT_IMAGE_PATH?=quay.io/lakshmiravichandran/test-broken-content:latest
 
 QUAY_NAMESPACE=compliance-operator
 OPERATOR_VERSION?=

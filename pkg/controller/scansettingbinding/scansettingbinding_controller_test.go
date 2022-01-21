@@ -61,7 +61,7 @@ var _ = Describe("Testing scansettingbinding controller", func() {
 				Namespace: common.GetComplianceOperatorNamespace(),
 			},
 			Spec: compv1alpha1.ProfileBundleSpec{
-				ContentImage: "quay.io/gquillar/ocp4:latest",
+				ContentImage: "quay.io/lakshmiravichandran/ocp4:latest",
 				ContentFile:  "ssg-rhcos4-ds.xml",
 			},
 			Status: compv1alpha1.ProfileBundleStatus{
