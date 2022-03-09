@@ -1,14 +1,14 @@
-#quay.io/lakshmiravichandran/compliance-operator-bundle
-#quay.io/lakshmiravichandran/compliance-operator
-#quay.io/lakshmiravichandran/compliance-operator-index
+# Temporary
+xxtagxx?=1.3.5
 
-# Operator variables
+
 # ==================
 export APP_NAME=compliance-operator
+xxnamexx=openscap-ocp
 
 # Container image variables
 # =========================
-
+IMAGE_REPO?=quay.io/lravichandran
 
 # Detect the OS to set per-OS defaults
 OS_NAME=$(shell uname -s)
@@ -34,25 +34,20 @@ else ifeq ($(RUNTIME), docker)
     LOGIN_PUSH_OPTS=
 endif
 
-# Temporary
-RELATED_IMAGE_OPENSCAP_NAME=openscap-ocp
-RELATED_IMAGE_OPENSCAP_TAG?=1.3.5
+
+# Operator variables
+DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(xxnamexx):$(xxtagxx)
 
 # Image path to use. Set this if you want to use a specific path for building
 # or your e2e tests. This is overwritten if we bulid the image and push it to
 # the cluster or if we're on CI.
-DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)
-#quay.io/compliance-operator/openscap-ocp:1.3.5
 DEFAULT_IMAGE_OPERATOR_PATH=quay.io/compliance-operator/$(APP_NAME):latest
-#quay.io/compliance-operator/compliance-operator:latest
-DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)
-#quay.io/compliance-operator/openscap-ocp:1.3.5
+DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(xxnamexx):$(xxtagxx)
 
-IMAGE_REPO?=quay.io/lakshmiravichandran
-RELATED_IMAGE_OPERATOR_PATH?=$(IMAGE_REPO)/$(APP_NAME)
-#quay.io/lakshmiravichandran/compliance-operator
-RELATED_IMAGE_OPENSCAP_PATH?=$(IMAGE_REPO)/$(RELATED_IMAGE_OPENSCAP_NAME)
-#quay.io/lakshmiravichandran/openscap-ocp
+
+xxpathxx?=$(IMAGE_REPO)/$(APP_NAME)
+xximage_openscap_pathxx?=$(IMAGE_REPO)/$(xxnamexx)
+
 OPENSCAP_DOCKER_CONTEXT=./images/openscap
 
 # Image tag to use. Set this if you want to use a specific tag for building
@@ -61,13 +56,11 @@ TAG?=latest
 
 BUNDLE_IMAGE_NAME=compliance-operator-bundle
 BUNDLE_IMAGE_PATH=$(IMAGE_REPO)/$(BUNDLE_IMAGE_NAME)
-#quay.io/lakshmiravichandran/compliance-operator-bundle
 BUNDLE_IMAGE_TAG?=$(TAG)
-
 TEST_BUNDLE_IMAGE_TAG?=testonly
+
 INDEX_IMAGE_NAME=compliance-operator-index
 INDEX_IMAGE_PATH=$(IMAGE_REPO)/$(INDEX_IMAGE_NAME)
-#quay.io/lakshmiravichandran/compliance-operator-index
 INDEX_IMAGE_TAG?=latest
 
 
@@ -117,7 +110,7 @@ TEST_OPTIONS?=
 # Skip pushing the container to your cluster
 E2E_SKIP_CONTAINER_PUSH?=false
 # Use default images in the e2e test run. Note that this takes precedence over E2E_SKIP_CONTAINER_PUSH
-E2E_USE_DEFAULT_IMAGES?=false
+#E2E_USE_DEFAULT_IMAGES?=false
 # In a local-env e2e run, push images to the cluster but skip building them. Useful if the container push fails.
 E2E_SKIP_CONTAINER_BUILD?=false
 
@@ -128,29 +121,30 @@ E2E_GO_TEST_FLAGS?=-test.v -test.timeout 120m
 
 # Specifies the image path to use for the content in the tests
 DEFAULT_CONTENT_IMAGE_PATH=quay.io/complianceascode/ocp4:latest
-
-E2E_CONTENT_IMAGE_PATH?=$(IMAGE_REPO)/ocp4:latest
-#LR
-#quay.io/lakshmiravichandran/ocp4:latest
-#E2E_CONTENT_IMAGE_PATH=$IMAGE_REPO/ocp4
-#E2E_BROKEN_CONTENT_IMAGE_PATH=$IMAGE_REPO/test-broken-content
-#E2E_USE_DEFAULT_IMAGES=true
-
+#E2E_CONTENT_IMAGE_PATH?=quay.io/complianceascode/ocp4:latest
 # We specifically omit the tag here since we use this for testing
 # different images referenced by different tags.
-E2E_BROKEN_CONTENT_IMAGE_PATH?=$(IMAGE_REPO)/test-broken-content
-#remove :latest tag consiously/volunterily LR
-#E2E_USE_DEFAULT_IMAGES=true
-#volunterly removed LR
-# quay.io/lakshmiravichandran/test-broken-content
+#E2E_BROKEN_CONTENT_IMAGE_PATH?=quay.io/compliance-operator/test-broken-content
 
-QUAY_NAMESPACE=compliance-operator
-OPERATOR_VERSION?=
-PREVIOUS_OPERATOR_VERSION=$(shell grep -E "\s+version: [0-9]+.[0-9]+.[0-9]+" deploy/olm-catalog/compliance-operator/manifests/compliance-operator.clusterserviceversion.yaml | sed 's/.*version: //')
-PACKAGE_CHANNEL?=alpha
+#QUAY_NAMESPACE=compliance-operator
+#OPERATOR_VERSION?=
+#PREVIOUS_OPERATOR_VERSION=$(shell grep -E "\s+version: [0-9]+.[0-9]+.[0-9]+" deploy/olm-catalog/compliance-operator/manifests/compliance-operator.clusterserviceversion.yaml | sed 's/.*version: //')
+#PACKAGE_CHANNEL?=alpha
 
-MUST_GATHER_IMAGE_PATH?=quay.io/compliance-operator/must-gather
+MUST_GATHER_IMAGE_PATH?=$(IMAGE_REPO)
 MUST_GATHER_IMAGE_TAG?=latest
+
+
+export IMAGE_REPO=quay.io/lakshmiravichandran
+export E2E_BROKEN_CONTENT_IMAGE_PATH=$IMAGE_REPO/test-broken-content
+export E2E_CONTENT_IMAGE_PATH=$IMAGE_REPO/ocp4
+export E2E_USE_DEFAULT_IMAGES=true
+
+
+@echo "Pushing image $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) to the image registry"
+
+
+
 
 .PHONY: all
 all: build ## Test and Build the compliance-operator
@@ -169,11 +163,11 @@ image: fmt operator-sdk operator-image bundle-image ## Build the compliance-oper
 
 .PHONY: operator-image
 operator-image:
-	$(RUNTIME) build -t $(RELATED_IMAGE_OPERATOR_PATH):$(TAG) -f build/Dockerfile .
+	$(RUNTIME) build -t $(xxpathxx):$(TAG) -f build/Dockerfile .
 
 .PHONY: openscap-image
 openscap-image:
-	$(RUNTIME) build --no-cache -t $(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG) $(OPENSCAP_DOCKER_CONTEXT)
+	$(RUNTIME) build --no-cache -t $(xximage_openscap_pathxx):$(xxtagxx) $(OPENSCAP_DOCKER_CONTEXT)
 
 .PHONY: bundle-image
 bundle-image:
@@ -333,54 +327,24 @@ test-benchmark: ## Run the benchmark tests -- Note that this can only be ran for
 e2e: namespace tear-down operator-sdk image-to-cluster openshift-user deploy-crds ## Run the end-to-end tests
 	@echo "WARNING: This will temporarily modify deploy/operator.yaml"
 	@echo "Replacing workload references in deploy/operator.yaml"
-
-	@echo "********************************************* replacement 1 "
-
-	@echo "$(DEFAULT_IMAGE_OPENSCAP_PATH) with $(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)"
-
-
-	#@$(SED) 's%$(DEFAULT_IMAGE_OPENSCAP_PATH)%$(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)%' deploy/operator.yaml
-	#ideally
-	#quay.io/compliance-operator/openscap-ocp:1.3.5  quay.io/lakshmiravichandran/openscap-ocp:1.3.5
-	@echo "********************************************* replacement 1 done"
-
-	@echo "********************************************* replacement 2 "
-
-	@echo "$(DEFAULT_IMAGE_OPERATOR_PATH) with $(RELATED_IMAGE_OPERATOR_PATH)"
-
-	#@$(SED) 's%$(DEFAULT_IMAGE_OPERATOR_PATH)%$(RELATED_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
-	#ideally
-	##quay.io/compliance-operator/compliance-operator:latest quay.io/lakshmiravichandran/compliance-operator
-	@echo "********************************************* replacement 2 done"
-
-	@echo "********************************************* replacement 3 "
-	@echo "$(DEFAULT_CONTENT_IMAGE_PATH) with $(E2E_CONTENT_IMAGE_PATH)"
-	#@$(SED) 's%$(DEFAULT_CONTENT_IMAGE_PATH)%$(E2E_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
-	#ideally
-	#quay.io/complianceascode/ocp4:latest quay.io/lakshmiravichandran/ocp4:latest
-	@echo "********************************************* replacement 3 done"
-
+	@$(SED) 's%$(DEFAULT_IMAGE_OPENSCAP_PATH)%$(xximage_openscap_pathxx):$(xxtagxx)%' deploy/operator.yaml
+	@$(SED) 's%$(DEFAULT_IMAGE_OPERATOR_PATH)%$(xxpathxx)%' deploy/operator.yaml
+	@$(SED) 's%$(DEFAULT_CONTENT_IMAGE_PATH)%$(E2E_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
 	@echo "Running e2e tests"
-	unset GOFLAGS && BROKEN_CONTENT_IMAGE=$(E2E_BROKEN_CONTENT_IMAGE_PATH) CONTENT_IMAGE=$(E2E_CONTENT_IMAGE_PATH) $(GOPATH)/bin/operator-sdk test local ./tests/e2e --skip-cleanup-error --image "$(RELATED_IMAGE_OPERATOR_PATH)" --go-test-flags "$(E2E_GO_TEST_FLAGS)"
+	unset GOFLAGS && BROKEN_CONTENT_IMAGE=$(E2E_BROKEN_CONTENT_IMAGE_PATH) CONTENT_IMAGE=$(E2E_CONTENT_IMAGE_PATH) $(GOPATH)/bin/operator-sdk test local ./tests/e2e --skip-cleanup-error --image "$(xxpathxx)" --go-test-flags "$(E2E_GO_TEST_FLAGS)"
 	@echo "Restoring image references in deploy/operator.yaml"
-	# LR anamoly
-	#quay.io/lakshmiravichandran/test-broken-content anamoly
-	#quay.io/lakshmiravichandran/ocp4:latest
-	#quay.io/lakshmiravichandran/compliance-operator
-
-	#@$(SED) 's%$(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)%$(DEFAULT_IMAGE_OPENSCAP_PATH)%' deploy/operator.yaml
-
-	#@$(SED) 's%$(RELATED_IMAGE_OPERATOR_PATH)%$(DEFAULT_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
-	#@$(SED) 's%$(E2E_CONTENT_IMAGE_PATH)%$(DEFAULT_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(xximage_openscap_pathxx):$(xxtagxx)%$(DEFAULT_IMAGE_OPENSCAP_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(xxpathxx)%$(DEFAULT_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(E2E_CONTENT_IMAGE_PATH)%$(DEFAULT_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
 
 e2e-local: operator-sdk tear-down deploy-crds ## Run the end-to-end tests on a locally running operator (e.g. using make run)
 	@echo "WARNING: This will temporarily modify deploy/operator.yaml"
 	@echo "Replacing workload references in deploy/operator.yaml"
-	@$(SED) 's%$(DEFAULT_IMAGE_OPERATOR_PATH)%$(RELATED_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(DEFAULT_IMAGE_OPERATOR_PATH)%$(xxpathxx)%' deploy/operator.yaml
 	@$(SED) 's%$(DEFAULT_CONTENT_IMAGE_PATH)%$(E2E_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
-	unset GOFLAGS && CONTENT_IMAGE=$(E2E_CONTENT_IMAGE_PATH) $(GOPATH)/bin/operator-sdk test local ./tests/e2e --up-local --skip-cleanup-error --image "$(RELATED_IMAGE_OPERATOR_PATH)" --go-test-flags "$(E2E_GO_TEST_FLAGS)"
+	unset GOFLAGS && CONTENT_IMAGE=$(E2E_CONTENT_IMAGE_PATH) $(GOPATH)/bin/operator-sdk test local ./tests/e2e --up-local --skip-cleanup-error --image "$(xxpathxx)" --go-test-flags "$(E2E_GO_TEST_FLAGS)"
 	@echo "Restoring image references in deploy/operator.yaml"
-	@$(SED) 's%$(RELATED_IMAGE_OPERATOR_PATH)%$(DEFAULT_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(xxpathxx)%$(DEFAULT_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
 	@$(SED) 's%$(E2E_CONTENT_IMAGE_PATH)%$(DEFAULT_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
 
 # If IMAGE_FROM_CI is not defined, it means that we're not running on CI, so we
@@ -391,7 +355,7 @@ e2e-local: operator-sdk tear-down deploy-crds ## Run the end-to-end tests on a l
 # The IMAGE_FROM_CI variable comes from CI. It is of the format:
 #     <image path in CI registry>:${component}
 # Here define the `component` variable, so, when we overwrite the
-# RELATED_IMAGE_OPERATOR_PATH variable, it'll expand to the component we need.
+# xxpathxx variable, it'll expand to the component we need.
 # Note that the `component` names come from the `openshift/release` repo
 # config.
 #
@@ -409,16 +373,16 @@ ifdef IMAGE_FROM_CI
 image-to-cluster:
 	@echo "IMAGE_FROM_CI variable detected. We're in a CI enviornment."
 	@echo "We're in a CI environment, skipping image-to-cluster target."
-	$(eval RELATED_IMAGE_OPERATOR_PATH = $(IMAGE_FROM_CI))
+	$(eval xxpathxx = $(IMAGE_FROM_CI))
 	$(eval E2E_CONTENT_IMAGE_PATH = $(CONTENT_IMAGE_FROM_CI))
-	$(eval RELATED_IMAGE_OPENSCAP_PATH = $(OPENSCAP_IMAGE_FROM_CI))
+	$(eval xximage_openscap_pathxx = $(OPENSCAP_IMAGE_FROM_CI))
 else ifeq ($(E2E_USE_DEFAULT_IMAGES), true)
 image-to-cluster:
 	@echo "E2E_USE_DEFAULT_IMAGES variable detected. Using default images."
 else ifeq ($(E2E_SKIP_CONTAINER_PUSH), true)
 image-to-cluster:
 	@echo "E2E_SKIP_CONTAINER_PUSH variable detected. Using previously pushed images."
-	$(eval RELATED_IMAGE_OPERATOR_PATH = image-registry.openshift-image-registry.svc:5000/openshift/$(APP_NAME):$(TAG))
+	$(eval xxpathxx = image-registry.openshift-image-registry.svc:5000/openshift/$(APP_NAME):$(TAG))
 else ifeq ($(E2E_SKIP_CONTAINER_BUILD), true)
 image-to-cluster: namespace cluster-image-push
 	@echo "E2E_SKIP_CONTAINER_BUILD variable detected. Using previously built local images."
@@ -431,15 +395,15 @@ endif
 cluster-image-push: namespace openshift-user
 	@echo "Temporarily exposing the default route to the image registry"
 	@oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge
-	@echo "Pushing image $(RELATED_IMAGE_OPERATOR_PATH):$(TAG) to the image registry"
+	@echo "Pushing image $(xxpathxx):$(TAG) to the image registry"
 	IMAGE_REGISTRY_HOST=$$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}'); \
 		$(RUNTIME) login $(LOGIN_PUSH_OPTS) -u $(OPENSHIFT_USER) -p $(shell oc whoami -t) $${IMAGE_REGISTRY_HOST}; \
-		$(RUNTIME) push $(LOGIN_PUSH_OPTS) $(RELATED_IMAGE_OPERATOR_PATH):$(TAG) $${IMAGE_REGISTRY_HOST}/openshift/$(APP_NAME):$(TAG); \
-		$(RUNTIME) push $(LOGIN_PUSH_OPTS) $(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG) $${IMAGE_REGISTRY_HOST}/openshift/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)
+		$(RUNTIME) push $(LOGIN_PUSH_OPTS) $(xxpathxx):$(TAG) $${IMAGE_REGISTRY_HOST}/openshift/$(APP_NAME):$(TAG); \
+		$(RUNTIME) push $(LOGIN_PUSH_OPTS) $(xximage_openscap_pathxx):$(xxtagxx) $${IMAGE_REGISTRY_HOST}/openshift/$(xxnamexx):$(xxtagxx)
 	@echo "Removing the route from the image registry"
 	@oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":false}}' --type=merge
-	$(eval RELATED_IMAGE_OPERATOR_PATH = image-registry.openshift-image-registry.svc:5000/openshift/$(APP_NAME):$(TAG))
-	$(eval RELATED_IMAGE_OPENSCAP_PATH = image-registry.openshift-image-registry.svc:5000/openshift/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG))
+	$(eval xxpathxx = image-registry.openshift-image-registry.svc:5000/openshift/$(APP_NAME):$(TAG))
+	$(eval xximage_openscap_pathxx = image-registry.openshift-image-registry.svc:5000/openshift/$(xxnamexx):$(xxtagxx))
 
 .PHONY: namespace
 namespace:
@@ -452,13 +416,13 @@ deploy: namespace deploy-crds ## Deploy the operator from the manifests in the d
 
 .PHONY: deploy-local
 deploy-local: namespace image-to-cluster deploy-crds ## Deploy the operator from the manifests in the deploy/ directory and the images from a local build
-	@$(SED) 's%$(IMAGE_REPO)/$(APP_NAME):latest%$(RELATED_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
-	@$(SED) 's%$(IMAGE_REPO)/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)%$(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)%' deploy/operator.yaml
+	@$(SED) 's%$(IMAGE_REPO)/$(APP_NAME):latest%$(xxpathxx)%' deploy/operator.yaml
+	@$(SED) 's%$(IMAGE_REPO)/$(xxnamexx):$(xxtagxx)%$(xximage_openscap_pathxx):$(xxtagxx)%' deploy/operator.yaml
 	@oc apply -n $(NAMESPACE) -f deploy/
 	@oc apply -f deploy/olm-catalog/compliance-operator/manifests/monitoring_clusterrolebinding.yaml
 	@oc apply -f deploy/olm-catalog/compliance-operator/manifests/monitoring_clusterrole.yaml
-	@$(SED) 's%$(RELATED_IMAGE_OPERATOR_PATH)%$(IMAGE_REPO)/$(APP_NAME):latest%' deploy/operator.yaml
-	@$(SED) 's%$(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)%$(IMAGE_REPO)/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)%' deploy/operator.yaml
+	@$(SED) 's%$(xxpathxx)%$(IMAGE_REPO)/$(APP_NAME):latest%' deploy/operator.yaml
+	@$(SED) 's%$(xximage_openscap_pathxx):$(xxtagxx)%$(IMAGE_REPO)/$(xxnamexx):$(xxtagxx)%' deploy/operator.yaml
 	@oc set triggers -n $(NAMESPACE) deployment/compliance-operator --from-image openshift/compliance-operator:latest -c compliance-operator
 
 .PHONY: deploy-crds
@@ -495,7 +459,7 @@ endif
 .PHONY: push
 push: image push-bundle
 	# compliance-operator manager
-	$(RUNTIME) push $(RELATED_IMAGE_OPERATOR_PATH):$(TAG)
+	$(RUNTIME) push $(xxpathxx):$(TAG)
 
 .PHONY: must-gather-push
 must-gather-push: must-gather-image
@@ -519,7 +483,7 @@ push-index: index-image
 .PHONY: push-openscap-image
 push-openscap-image: openscap-image
 	# openscap image
-	$(RUNTIME) push $(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)
+	$(RUNTIME) push $(xximage_openscap_pathxx):$(xxtagxx)
 
 .PHONY: check-operator-version
 check-operator-version:
@@ -543,12 +507,12 @@ package-version-to-tag: check-operator-version
 .PHONY: release-tag-image
 release-tag-image: package-version-to-tag
 	@echo "Temporarily overriding image tags in deploy/operator.yaml"
-	@$(SED) 's%$(IMAGE_REPO)/$(APP_NAME):latest%$(RELATED_IMAGE_OPERATOR_PATH):$(TAG)%' deploy/operator.yaml
+	@$(SED) 's%$(IMAGE_REPO)/$(APP_NAME):latest%$(xxpathxx):$(TAG)%' deploy/operator.yaml
 
 .PHONY: undo-deploy-tag-image
 undo-deploy-tag-image: package-version-to-tag
 	@echo "Restoring image tags in deploy/operator.yaml"
-	@$(SED) 's%$(RELATED_IMAGE_OPERATOR_PATH):$(TAG)%$(IMAGE_REPO)/$(APP_NAME):latest%' deploy/operator.yaml
+	@$(SED) 's%$(xxpathxx):$(TAG)%$(IMAGE_REPO)/$(APP_NAME):latest%' deploy/operator.yaml
 
 .PHONY: git-release
 git-release: package-version-to-tag changelog

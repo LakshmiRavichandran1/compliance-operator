@@ -47,11 +47,11 @@ spec:
                   fieldPath: metadata.name
             - name: RELATED_IMAGE_OPENSCAP
               # Hardcoding this temporarily until its propagated to CI
-              value: "quay.io/compliance-operator/openscap-ocp:1.3.5"
+              value: "quay.io/lakshmiravichandran/openscap-ocp:1.3.5"
             - name: RELATED_IMAGE_OPERATOR
-              value: "quay.io/compliance-operator/compliance-operator:latest"
+              value: "quay.io/lakshmiravichandran/compliance-operator:latest"
             - name: RELATED_IMAGE_PROFILE
-              value: "quay.io/complianceascode/ocp4:latest"
+              value: "quay.io/lakshmiravichandran/ocp4:latest"
           volumeMounts:
             - name: serving-cert
               mountPath: /var/run/secrets/serving-cert

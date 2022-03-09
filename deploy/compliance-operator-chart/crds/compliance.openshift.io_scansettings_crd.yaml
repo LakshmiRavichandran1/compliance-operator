@@ -87,6 +87,7 @@ spec:
                   also need to be stored. Defaults to 1Gi.
                 type: string
               storageClassName:
+                default: 'local-sc'
                 description: Specifies the StorageClassName to use when creating the
                   PersistentVolumeClaim to hold the raw results. By default this is
                   null, which will attempt to use the default storage class configured

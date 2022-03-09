@@ -1,0 +1,71 @@
+quay.io/lakshmiravichandran/compliance-operator-bundle
+quay.io/lakshmiravichandran/compliance-operator
+quay.io/lakshmiravichandran/compliance-operator-index
+
+# Operator variables
+# ==================
+export APP_NAME=compliance-operator
+
+# Container image variables
+# =========================
+
+
+# Detect the OS to set per-OS defaults
+OS_NAME=$(shell uname -s)
+# Container runtime
+ifeq ($(OS_NAME), Linux)
+    RUNTIME?=podman
+    SED=sed -i
+else ifeq ($(OS_NAME), Darwin)
+    RUNTIME?=docker
+    SED=sed -i ''
+endif
+
+ARCH?=$(shell uname -m)
+ifeq ($(ARCH), x86_64)
+    OPM_ARCH?=amd64
+else
+    OPM_ARCH?=$(ARCH)
+endif
+
+ifeq ($(RUNTIME), podman)
+    LOGIN_PUSH_OPTS="--tls-verify=false"
+else ifeq ($(RUNTIME), docker)
+    LOGIN_PUSH_OPTS=
+endif
+
+# Temporary
+RELATED_IMAGE_OPENSCAP_NAME=openscap-ocp
+RELATED_IMAGE_OPENSCAP_TAG?=1.3.5
+
+# Image path to use. Set this if you want to use a specific path for building
+# or your e2e tests. This is overwritten if we bulid the image and push it to
+# the cluster or if we're on CI.
+DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)
+#quay.io/compliance-operator/openscap-ocp:1.3.5
+DEFAULT_IMAGE_OPERATOR_PATH=quay.io/compliance-operator/$(APP_NAME):latest
+#quay.io/compliance-operator/compliance-operator:latest
+DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)
+#quay.io/compliance-operator/openscap-ocp:1.3.5
+
+IMAGE_REPO?=quay.io/lakshmiravichandran
+RELATED_IMAGE_OPERATOR_PATH?=$(IMAGE_REPO)/$(APP_NAME)
+#quay.io/lakshmiravichandran/compliance-operator
+RELATED_IMAGE_OPENSCAP_PATH?=$(IMAGE_REPO)/$(RELATED_IMAGE_OPENSCAP_NAME)
+#quay.io/lakshmiravichandran/openscap-ocp
+OPENSCAP_DOCKER_CONTEXT=./images/openscap
+
+# Image tag to use. Set this if you want to use a specific tag for building
+# or your e2e tests.
+TAG?=latest
+
+BUNDLE_IMAGE_NAME=compliance-operator-bundle
+BUNDLE_IMAGE_PATH=$(IMAGE_REPO)/$(BUNDLE_IMAGE_NAME)
+#quay.io/lakshmiravichandran/compliance-operator-bundle
+BUNDLE_IMAGE_TAG?=$(TAG)
+
+TEST_BUNDLE_IMAGE_TAG?=testonly
+INDEX_IMAGE_NAME=compliance-operator-index
+INDEX_IMAGE_PATH=$(IMAGE_REPO)/$(INDEX_IMAGE_NAME)
+#quay.io/lakshmiravichandran/compliance-operator-index
+INDEX_IMAGE_TAG?=latest

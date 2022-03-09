@@ -1,14 +1,14 @@
-#quay.io/lakshmiravichandran/compliance-operator-bundle
-#quay.io/lakshmiravichandran/compliance-operator
-#quay.io/lakshmiravichandran/compliance-operator-index
+# Temporary
+RELATED_IMAGE_OPENSCAP_TAG?=1.3.5
 
-# Operator variables
+
 # ==================
 export APP_NAME=compliance-operator
+RELATED_IMAGE_OPENSCAP_NAME=openscap-ocp
 
 # Container image variables
 # =========================
-
+IMAGE_REPO?=quay.io/lravichandran
 
 # Detect the OS to set per-OS defaults
 OS_NAME=$(shell uname -s)
@@ -34,26 +34,40 @@ else ifeq ($(RUNTIME), docker)
     LOGIN_PUSH_OPTS=
 endif
 
-# Temporary
-RELATED_IMAGE_OPENSCAP_NAME=openscap-ocp
-RELATED_IMAGE_OPENSCAP_TAG?=1.3.5
+
+# Operator variables
+DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)
 
 # Image path to use. Set this if you want to use a specific path for building
 # or your e2e tests. This is overwritten if we bulid the image and push it to
 # the cluster or if we're on CI.
-DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)
-#quay.io/compliance-operator/openscap-ocp:1.3.5
 DEFAULT_IMAGE_OPERATOR_PATH=quay.io/compliance-operator/$(APP_NAME):latest
-#quay.io/compliance-operator/compliance-operator:latest
 DEFAULT_IMAGE_OPENSCAP_PATH=quay.io/compliance-operator/$(RELATED_IMAGE_OPENSCAP_NAME):$(RELATED_IMAGE_OPENSCAP_TAG)
-#quay.io/compliance-operator/openscap-ocp:1.3.5
 
-IMAGE_REPO?=quay.io/lakshmiravichandran
+
 RELATED_IMAGE_OPERATOR_PATH?=$(IMAGE_REPO)/$(APP_NAME)
-#quay.io/lakshmiravichandran/compliance-operator
+#LR :latest is needed
 RELATED_IMAGE_OPENSCAP_PATH?=$(IMAGE_REPO)/$(RELATED_IMAGE_OPENSCAP_NAME)
-#quay.io/lakshmiravichandran/openscap-ocp
+#LR :tag is needed
+
 OPENSCAP_DOCKER_CONTEXT=./images/openscap
+
+-- LR
+RELATED_IMAGE_OPENSCAP_TAG
+RELATED_IMAGE_OPENSCAP_NAME
+
+RELATED_IMAGE_OPENSCAP_NAME
+RELATED_IMAGE_OPENSCAP_TAG
+
+RELATED_IMAGE_OPERATOR_PATH
+RELATED_IMAGE_OPENSCAP_PATH
+
+RELATED_IMAGE_OPERATOR_PATH?=$(IMAGE_REPO)/$(APP_NAME)
+RELATED_IMAGE_OPENSCAP_PATH?=$(IMAGE_REPO)/$(xxnamexx)
+
+this is suspicious
+
+--LR
 
 # Image tag to use. Set this if you want to use a specific tag for building
 # or your e2e tests.
@@ -61,13 +75,11 @@ TAG?=latest
 
 BUNDLE_IMAGE_NAME=compliance-operator-bundle
 BUNDLE_IMAGE_PATH=$(IMAGE_REPO)/$(BUNDLE_IMAGE_NAME)
-#quay.io/lakshmiravichandran/compliance-operator-bundle
 BUNDLE_IMAGE_TAG?=$(TAG)
-
 TEST_BUNDLE_IMAGE_TAG?=testonly
+
 INDEX_IMAGE_NAME=compliance-operator-index
 INDEX_IMAGE_PATH=$(IMAGE_REPO)/$(INDEX_IMAGE_NAME)
-#quay.io/lakshmiravichandran/compliance-operator-index
 INDEX_IMAGE_TAG?=latest
 
 
@@ -117,7 +129,7 @@ TEST_OPTIONS?=
 # Skip pushing the container to your cluster
 E2E_SKIP_CONTAINER_PUSH?=false
 # Use default images in the e2e test run. Note that this takes precedence over E2E_SKIP_CONTAINER_PUSH
-E2E_USE_DEFAULT_IMAGES?=false
+#E2E_USE_DEFAULT_IMAGES?=false
 # In a local-env e2e run, push images to the cluster but skip building them. Useful if the container push fails.
 E2E_SKIP_CONTAINER_BUILD?=false
 
@@ -128,29 +140,28 @@ E2E_GO_TEST_FLAGS?=-test.v -test.timeout 120m
 
 # Specifies the image path to use for the content in the tests
 DEFAULT_CONTENT_IMAGE_PATH=quay.io/complianceascode/ocp4:latest
-
-E2E_CONTENT_IMAGE_PATH?=$(IMAGE_REPO)/ocp4:latest
-#LR
-#quay.io/lakshmiravichandran/ocp4:latest
-#E2E_CONTENT_IMAGE_PATH=$IMAGE_REPO/ocp4
-#E2E_BROKEN_CONTENT_IMAGE_PATH=$IMAGE_REPO/test-broken-content
-#E2E_USE_DEFAULT_IMAGES=true
-
+#E2E_CONTENT_IMAGE_PATH?=quay.io/complianceascode/ocp4:latest
 # We specifically omit the tag here since we use this for testing
 # different images referenced by different tags.
-E2E_BROKEN_CONTENT_IMAGE_PATH?=$(IMAGE_REPO)/test-broken-content
-#remove :latest tag consiously/volunterily LR
-#E2E_USE_DEFAULT_IMAGES=true
-#volunterly removed LR
-# quay.io/lakshmiravichandran/test-broken-content
+#E2E_BROKEN_CONTENT_IMAGE_PATH?=quay.io/compliance-operator/test-broken-content
 
-QUAY_NAMESPACE=compliance-operator
-OPERATOR_VERSION?=
-PREVIOUS_OPERATOR_VERSION=$(shell grep -E "\s+version: [0-9]+.[0-9]+.[0-9]+" deploy/olm-catalog/compliance-operator/manifests/compliance-operator.clusterserviceversion.yaml | sed 's/.*version: //')
-PACKAGE_CHANNEL?=alpha
+#QUAY_NAMESPACE=compliance-operator
+#OPERATOR_VERSION?=
+#PREVIOUS_OPERATOR_VERSION=$(shell grep -E "\s+version: [0-9]+.[0-9]+.[0-9]+" deploy/olm-catalog/compliance-operator/manifests/compliance-operator.clusterserviceversion.yaml | sed 's/.*version: //')
+#PACKAGE_CHANNEL?=alpha
 
-MUST_GATHER_IMAGE_PATH?=quay.io/compliance-operator/must-gather
+MUST_GATHER_IMAGE_PATH?=$(IMAGE_REPO)
 MUST_GATHER_IMAGE_TAG?=latest
+
+
+export IMAGE_REPO=quay.io/lakshmiravichandran
+export E2E_BROKEN_CONTENT_IMAGE_PATH=$IMAGE_REPO/test-broken-content
+export E2E_CONTENT_IMAGE_PATH=$IMAGE_REPO/ocp4
+export E2E_USE_DEFAULT_IMAGES=true
+
+
+@echo "Pushing image $(INDEX_IMAGE_PATH):$(INDEX_IMAGE_TAG) to the image registry"
+
 
 .PHONY: all
 all: build ## Test and Build the compliance-operator
@@ -333,45 +344,15 @@ test-benchmark: ## Run the benchmark tests -- Note that this can only be ran for
 e2e: namespace tear-down operator-sdk image-to-cluster openshift-user deploy-crds ## Run the end-to-end tests
 	@echo "WARNING: This will temporarily modify deploy/operator.yaml"
 	@echo "Replacing workload references in deploy/operator.yaml"
-
-	@echo "********************************************* replacement 1 "
-
-	@echo "$(DEFAULT_IMAGE_OPENSCAP_PATH) with $(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)"
-
-
-	#@$(SED) 's%$(DEFAULT_IMAGE_OPENSCAP_PATH)%$(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)%' deploy/operator.yaml
-	#ideally
-	#quay.io/compliance-operator/openscap-ocp:1.3.5  quay.io/lakshmiravichandran/openscap-ocp:1.3.5
-	@echo "********************************************* replacement 1 done"
-
-	@echo "********************************************* replacement 2 "
-
-	@echo "$(DEFAULT_IMAGE_OPERATOR_PATH) with $(RELATED_IMAGE_OPERATOR_PATH)"
-
-	#@$(SED) 's%$(DEFAULT_IMAGE_OPERATOR_PATH)%$(RELATED_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
-	#ideally
-	##quay.io/compliance-operator/compliance-operator:latest quay.io/lakshmiravichandran/compliance-operator
-	@echo "********************************************* replacement 2 done"
-
-	@echo "********************************************* replacement 3 "
-	@echo "$(DEFAULT_CONTENT_IMAGE_PATH) with $(E2E_CONTENT_IMAGE_PATH)"
-	#@$(SED) 's%$(DEFAULT_CONTENT_IMAGE_PATH)%$(E2E_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
-	#ideally
-	#quay.io/complianceascode/ocp4:latest quay.io/lakshmiravichandran/ocp4:latest
-	@echo "********************************************* replacement 3 done"
-
+	@$(SED) 's%$(DEFAULT_IMAGE_OPENSCAP_PATH)%$(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)%' deploy/operator.yaml
+	@$(SED) 's%$(DEFAULT_IMAGE_OPERATOR_PATH)%$(RELATED_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(DEFAULT_CONTENT_IMAGE_PATH)%$(E2E_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
 	@echo "Running e2e tests"
 	unset GOFLAGS && BROKEN_CONTENT_IMAGE=$(E2E_BROKEN_CONTENT_IMAGE_PATH) CONTENT_IMAGE=$(E2E_CONTENT_IMAGE_PATH) $(GOPATH)/bin/operator-sdk test local ./tests/e2e --skip-cleanup-error --image "$(RELATED_IMAGE_OPERATOR_PATH)" --go-test-flags "$(E2E_GO_TEST_FLAGS)"
 	@echo "Restoring image references in deploy/operator.yaml"
-	# LR anamoly
-	#quay.io/lakshmiravichandran/test-broken-content anamoly
-	#quay.io/lakshmiravichandran/ocp4:latest
-	#quay.io/lakshmiravichandran/compliance-operator
-
-	#@$(SED) 's%$(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)%$(DEFAULT_IMAGE_OPENSCAP_PATH)%' deploy/operator.yaml
-
-	#@$(SED) 's%$(RELATED_IMAGE_OPERATOR_PATH)%$(DEFAULT_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
-	#@$(SED) 's%$(E2E_CONTENT_IMAGE_PATH)%$(DEFAULT_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(RELATED_IMAGE_OPENSCAP_PATH):$(RELATED_IMAGE_OPENSCAP_TAG)%$(DEFAULT_IMAGE_OPENSCAP_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(RELATED_IMAGE_OPERATOR_PATH)%$(DEFAULT_IMAGE_OPERATOR_PATH)%' deploy/operator.yaml
+	@$(SED) 's%$(E2E_CONTENT_IMAGE_PATH)%$(DEFAULT_CONTENT_IMAGE_PATH)%' deploy/operator.yaml
 
 e2e-local: operator-sdk tear-down deploy-crds ## Run the end-to-end tests on a locally running operator (e.g. using make run)
 	@echo "WARNING: This will temporarily modify deploy/operator.yaml"
